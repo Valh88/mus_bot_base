@@ -14,11 +14,11 @@ alembic revision --autogenerate -m "migration_name"
 alembic upgrade head
 """
 import uuid
-
+from typing import List
 import datetime
-from sqlalchemy import String, Integer
+from sqlalchemy import String, Integer, ForeignKey
 from sqlalchemy.dialects.postgresql import UUID
-from sqlalchemy.orm import DeclarativeBase, Mapped, mapped_column
+from sqlalchemy.orm import DeclarativeBase, Mapped, mapped_column, relationship
 from sqlalchemy_utils import ChoiceType
 
 
@@ -43,7 +43,7 @@ class Band(Base):
 
     STATUS = [
         ('yes', 'active'),
-        ('no', 'unactive')
+        ('no', 'unactive'),
     ]
 
     id: Mapped[str] = mapped_column(
@@ -67,7 +67,7 @@ class Album(Base):
     FORMAT = [
         ('cassette', 'cassete'),
         ('disc', 'disc'),
-        ('vinil', 'vinil')
+        ('vinil', 'vinil'),
     ]
 
     id: Mapped[str] = mapped_column(
@@ -81,4 +81,17 @@ class Album(Base):
     label: Mapped[str] = mapped_column(String(30))
     format: Mapped[ChoiceType] = mapped_column(ChoiceType(FORMAT))
     limitation: Mapped[int] = mapped_column(Integer)
-    # songs:
+    songs: Mapped[List['Track']] = relationship('Track', back_populates='album', cascade='delete, all')
+    commentary: Mapped[str] = mapped_column(String(300))
+
+
+class Track(Base):
+    __tablename__ = 'songs'
+
+    id: Mapped[str] = mapped_column(
+        UUID(as_uuid=False), primary_key=True, default=lambda _: str(uuid.uuid4())
+    )
+    name: Mapped[str] = mapped_column(String(60), nullable=False)
+    num_song: Mapped[int] = mapped_column(Integer, nullable=False)
+    album_id: Mapped[str] = mapped_column(ForeignKey("albums.id"), nullable=False) 
+    album: Mapped["Album"] = relationship("Album", back_populates="songs")
