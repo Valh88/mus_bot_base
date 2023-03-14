@@ -8,6 +8,7 @@ version: "3.7"
 
 services:
   default_database:
+    container_name: prod_db
     restart: unless-stopped
     image: postgres:latest
     volumes:
@@ -23,6 +24,7 @@ services:
 
   test_database:
     restart: unless-stopped
+    container_name: test_db
     image: postgres:latest
     volumes:
       - test_database_data:/var/lib/postgresql/data
@@ -34,6 +36,20 @@ services:
       - .env
     ports:
       - "${TEST_DATABASE_PORT}:5432"
+  
+  pgadmin:
+    image: dpage/pgadmin4
+    depends_on:
+      - test_database
+    environment:
+      - PGADMIN_LISTEN_ADDRESS=0.0.0.0
+      - PGADMIN_LISTEN_PORT=5050
+      - PGADMIN_DEFAULT_EMAIL=test@example.com
+      - PGADMIN_DEFAULT_PASSWORD=1
+    ports:
+      - 5050:5050
+#    volumes:
+#          - "./pgadmin:/var/lib/pgadmin"
 
 volumes:
   test_database_data:

@@ -4,6 +4,7 @@ from collections.abc import AsyncGenerator
 import jwt
 from fastapi import Depends, HTTPException, status
 from fastapi.security import OAuth2PasswordBearer
+from fastapi.security.api_key import APIKeyHeader
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
@@ -12,6 +13,8 @@ from app.core.session import async_session
 from app.models import User
 
 reusable_oauth2 = OAuth2PasswordBearer(tokenUrl="auth/access-token")
+
+api_key = APIKeyHeader(name='mus-key', auto_error=False)
 
 
 async def get_session() -> AsyncGenerator[AsyncSession, None]:
@@ -52,3 +55,19 @@ async def get_current_user(
     if not user:
         raise HTTPException(status_code=404, detail="User not found.")
     return user
+
+
+async def check_api_key(
+        api_key: str=Depends(api_key)
+)-> security.ApiKey:
+    print(api_key)
+    try:
+        payload = jwt.decode(
+            api_key, config.settings.SECRET_KEY, algorithms=[security.JWT_ALGORITHM]
+        )
+    except jwt.DecodeError:
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="Could not validate credentials.",
+        )
+    return payload

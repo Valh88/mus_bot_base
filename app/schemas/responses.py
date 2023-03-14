@@ -17,6 +17,12 @@ class AccessTokenResponse(BaseResponse):
     refresh_token_issued_at: int
 
 
+class AccessApiKey(BaseResponse):
+    apikey: str
+    expores_at: int
+    issued_at: int
+    
+
 class UserResponse(BaseResponse):
     id: str
     email: EmailStr
