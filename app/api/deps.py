@@ -60,7 +60,6 @@ async def get_current_user(
 async def check_api_key(
         api_key: str=Depends(api_key)
 )-> security.ApiKey:
-    print(api_key)
     try:
         payload = jwt.decode(
             api_key, config.settings.SECRET_KEY, algorithms=[security.JWT_ALGORITHM]
@@ -68,6 +67,6 @@ async def check_api_key(
     except jwt.DecodeError:
         raise HTTPException(
             status_code=status.HTTP_403_FORBIDDEN,
-            detail="Could not validate credentials.",
+            detail="dont have api-key service",
         )
     return payload
