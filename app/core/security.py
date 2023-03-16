@@ -7,7 +7,7 @@ from passlib.context import CryptContext
 from pydantic import BaseModel
 
 from app.core import config
-from app.schemas.responses import AccessTokenResponse
+from app.schemas.responses import AccessTokenResponse, AccessApiKey
 
 JWT_ALGORITHM = "HS256"
 ACCESS_TOKEN_EXPIRE_SECS = config.settings.ACCESS_TOKEN_EXPIRE_MINUTES * 60
@@ -24,6 +24,14 @@ class JWTTokenPayload(BaseModel):
     refresh: bool
     issued_at: int
     expires_at: int
+
+
+class ApiKey(BaseModel):
+    sub: str | int
+    refresh: bool
+    issued_at: int
+    expires_at: int
+
 
 
 def create_jwt_token(subject: str | int, exp_secs: int, refresh: bool):
@@ -49,6 +57,7 @@ def create_jwt_token(subject: str | int, exp_secs: int, refresh: bool):
         key=config.settings.SECRET_KEY,
         algorithm=JWT_ALGORITHM,
     )
+    # print(jwt.decode(encoded_jwt))
     return encoded_jwt, expires_at, issued_at
 
 
@@ -68,6 +77,17 @@ def generate_access_token_response(subject: str | int):
         refresh_token=refresh_token,
         refresh_token_expires_at=refresh_expires_at,
         refresh_token_issued_at=refresh_issued_at,
+    )
+
+
+def create_api_key(subject: str | int):
+    access_token, expires_at, issued_at = create_jwt_token(
+        subject, 525600, refresh=False
+    )
+    return AccessApiKey(
+        apikey=access_token,
+        expores_at=expires_at,
+        issued_at=issued_at,
     )
 
 

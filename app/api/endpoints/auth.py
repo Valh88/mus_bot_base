@@ -11,7 +11,7 @@ from app.api import deps
 from app.core import config, security
 from app.models import User
 from app.schemas.requests import RefreshTokenRequest
-from app.schemas.responses import AccessTokenResponse
+from app.schemas.responses import AccessTokenResponse, AccessApiKey
 
 router = APIRouter()
 
@@ -75,3 +75,12 @@ async def refresh_token(
         raise HTTPException(status_code=404, detail="User not found")
 
     return security.generate_access_token_response(str(user.id))
+
+
+@router.get('/get-api-key', response_model=AccessApiKey)
+async def get_api_key(
+    current_user: User = Depends(deps.get_current_user),
+    # session: AsyncSession = Depends(deps.get_session),
+) -> AccessApiKey:
+    api_key: AccessApiKey = security.create_api_key(current_user.id)
+    return api_key
