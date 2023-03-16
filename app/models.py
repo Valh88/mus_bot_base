@@ -50,8 +50,8 @@ class Band(Base):
     __tablename__ = "bands"
 
     STATUS = [
-        ('yes', 'active'),
-        ('no', 'unactive'),
+        ('active', 'active'),
+        ('unactive', 'unactive'),
     ]
 
     id: Mapped[str] = mapped_column(
