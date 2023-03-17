@@ -38,14 +38,6 @@ class User(Base):
     hashed_password: Mapped[str] = mapped_column(String(128), nullable=False)
 
 
-association_table_band_genres = Table(
-    'association_table_band_genres',
-    Base.metadata,
-    Column('band_id', ForeignKey('bands.id'), primary_key=True),
-    Column('genre_id', ForeignKey('genres.id'), primary_key=True),
-)
-
-
 class Band(Base):
     __tablename__ = "bands"
 
@@ -62,20 +54,27 @@ class Band(Base):
     location: Mapped[str] = mapped_column(String(30), nullable=False)
     status: Mapped[ChoiceType] = mapped_column(ChoiceType(STATUS))
     formed_in: Mapped[datetime.datetime]
-    description: Mapped[str] = mapped_column(String(800))
+    description: Mapped[str] = mapped_column(String(800), nullable=True)
     # # ears_active: Mapped[str]
     genres: Mapped[List['Genre']] = relationship(
-        secondary=association_table_band_genres, back_populates='bands'
+        secondary='association_table_band_genres', back_populates='bands', 
     )
+    # genre_associations: Mapped[List['AssociationBandGenres']] = relationship(back_populates='band')
     discography: Mapped[List['Album']] = relationship('Album', back_populates='band', cascade='delete, all')
-    themes: Mapped[str] = mapped_column(String(100), nullable=False)
+    themes: Mapped[str] = mapped_column(String(100), nullable=True)
     pictures: Mapped[List['BandPicture']] = relationship(
         secondary='association_band_pictures', back_populates='bands'
     )
-    picture_associations: Mapped[List['AssociationBandPicture']] = relationship(back_populates='band')
-    commentary: Mapped[str] = mapped_column(String(300))
+    # picture_associations: Mapped[List['AssociationBandPicture']] = relationship(back_populates='band')
+    commentary: Mapped[str] = mapped_column(String(300), nullable=True)
 
-
+    @property
+    def genres_str(self):
+        string = ''
+        for genre in self.genres:
+            string+= genre.genre
+        print(string)
+        return string
 class Album(Base):
     __tablename__ = 'albums'
 
@@ -97,12 +96,12 @@ class Album(Base):
     format: Mapped[ChoiceType] = mapped_column(ChoiceType(FORMAT))
     limitation: Mapped[int] = mapped_column(Integer)
     band_id: Mapped[str] = mapped_column(ForeignKey('bands.id'), nullable=False)
-    band: Mapped['Band'] = relationship('Band', back_populates='albums')
+    band: Mapped['Band'] = relationship('Band', back_populates='discography')
     songs: Mapped[List['Track']] = relationship('Track', back_populates='album', cascade='delete, all')
     pictures: Mapped[List['AlbumPicture']] = relationship(
-        secondary='associations_album_picture', back_populates='albums'
+        secondary='associations_album_picture', back_populates='album'
     )
-    picture_assotiations: Mapped[List['AssociationsAlbumPicture']] = relationship(back_populates='album')
+    # picture_associations: Mapped[List['AssociationsAlbumPicture']] = relationship(back_populates='album')
     commentary: Mapped[str] = mapped_column(String(300))
 
 
@@ -127,8 +126,9 @@ class Genre(Base):
     )
     genre: Mapped[str] = mapped_column(String(20), nullable=False)
     bands: Mapped[List['Band']] = relationship(
-        secondary=association_table_band_genres, back_populates='genres',
+        secondary='association_table_band_genres', back_populates='genres',
     )
+    # band_associations: Mapped[List['AssociationBandGenres']] = relationship(back_populates='genre')
 
 
 class BandPicture(Base):
@@ -138,10 +138,10 @@ class BandPicture(Base):
         UUID(as_uuid=False), primary_key=True, default=lambda _: str(uuid.uuid4())
     )
     path: Mapped[str] = mapped_column(String(60), nullable=True)
-    band: Mapped[List['Band']] = relationship(
+    bands: Mapped[List['Band']] = relationship(
         secondary='association_band_pictures', back_populates='pictures'
     )
-    band_associations: Mapped[List['AssociationBandPicture']] = relationship(back_populates='picture')
+    # band_associations: Mapped[List['AssociationBandPicture']] = relationship(back_populates='picture')
 
 
 class AlbumPicture(Base):
@@ -154,7 +154,7 @@ class AlbumPicture(Base):
     album: Mapped[List['Album']] = relationship(
         secondary='associations_album_picture', back_populates='pictures'
     )
-    album_associations: Mapped[List['AssociationsAlbumPicture']] = relationship(back_populates='picture')
+    # album_assotiations: Mapped[List['AssociationsAlbumPicture']] = relationship(back_populates='picture')
 
 
 class AssociationsAlbumPicture(Base):
@@ -162,8 +162,8 @@ class AssociationsAlbumPicture(Base):
 
     album_id: Mapped[str] = mapped_column(ForeignKey('albums.id'), primary_key=True)
     picture_id: Mapped[str] = mapped_column(ForeignKey('album_pictures.id'), primary_key=True)
-    album: Mapped['Album'] = relationship(back_populates='picture_associations')
-    picture: Mapped['AlbumPicture'] = relationship(back_populates='album_assotiations')
+    # album: Mapped['Album'] = relationship(back_populates='picture_associations')
+    # picture: Mapped['AlbumPicture'] = relationship(back_populates='album_assotiations')
 
 
 class AssociationBandPicture(Base):
@@ -171,5 +171,15 @@ class AssociationBandPicture(Base):
 
     band_id: Mapped[str] = mapped_column(ForeignKey('bands.id'), primary_key=True)
     picture_id: Mapped[str] = mapped_column(ForeignKey('band_pictures.id'), primary_key=True)
-    band: Mapped['Band'] = relationship(back_populates='picture_associations')
-    picture: Mapped['BandPicture'] = relationship(back_populates='band_associations')
+    # band: Mapped['Band'] = relationship(back_populates='picture_associations')
+    # picture: Mapped['BandPicture'] = relationship(back_populates='band_associations')
+
+
+class AssociationBandGenres(Base):
+    __tablename__ = 'association_table_band_genres'
+
+    band_id: Mapped[str] = mapped_column(ForeignKey('bands.id'), primary_key=True)
+    genre_id: Mapped[str] = mapped_column(ForeignKey('genres.id'), primary_key=True)
+    # band: Mapped['Band'] = relationship(back_populates='genre_associations')
+    # genre: Mapped['Genre'] = relationship(back_populates='band_associations')
+
