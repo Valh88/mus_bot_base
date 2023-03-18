@@ -31,6 +31,16 @@ services:
       - DEFAULT_DATABASE_PORT=5432
     ports:
       - 80:8000
+  # nginx:
+  #   build: ./nginx
+  #   volumes:
+  #     - ./media:/www/data/images
+  #   ports:
+  #     - "8080:80"
+  #   depends_on:
+  #     - app
+  #   networks:
+  #     - network
 
 volumes:
   postgres_data:

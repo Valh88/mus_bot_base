@@ -34,8 +34,10 @@ class BandListSchema(BaseBand):
     contry_of_origin: str 
     location: str
     # status: Dict
-    genres: List[GenreSchema] = []
+    # genres: List[GenreSchema] = []
+    pictures_url: List[str] = []
     themes: Optional[str] = None
+    genres_str: List[str] = []
 
 
 class BandFullSchema(BaseBand):
@@ -43,6 +45,7 @@ class BandFullSchema(BaseBand):
     contry_of_origin: str 
     location: str
     # status: str
+    pictures_url: List[str]
     formed_in: datetime.datetime
     description: str
     genres: List[GenreSchema] = []

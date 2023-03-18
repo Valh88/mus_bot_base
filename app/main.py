@@ -27,3 +27,14 @@ app.add_middleware(
 
 # Guards against HTTP Host Header attacks
 app.add_middleware(TrustedHostMiddleware, allowed_hosts=config.settings.ALLOWED_HOSTS)
+
+
+if config.settings.ENVIRONMENT == 'PYTEST':
+    # from pathlib import Path
+    from fastapi.staticfiles import StaticFiles
+    # print(str(Path(__file__).parents[1]) + "/media")
+    app.mount(
+        '/media', StaticFiles(directory="media/band"), name='band'
+    )
+
+    

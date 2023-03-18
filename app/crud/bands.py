@@ -19,7 +19,8 @@ async def create(
         status=band.status,
         formed_in=datetime.datetime.now(),
         description=band.description,
-        commentary='3123123',
+        themes=band.themes
+        # commentary='3123123',
     )
     session.add(band), await session.commit()
     if len(genres) > 0:
@@ -43,6 +44,8 @@ async def get_by_id(
 async def get_all_bands(
         session: AsyncSession,
 ) -> List[Band]:
-    band_list = await session.execute(select(Band)
-                    .options(selectinload(Band.genres)))
+    band_list = await session.execute(
+        select(Band)
+        # .options(selectinload(Band.genres))
+    )
     return band_list.scalars().all()

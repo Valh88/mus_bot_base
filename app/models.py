@@ -57,24 +57,31 @@ class Band(Base):
     description: Mapped[str] = mapped_column(String(800), nullable=True)
     # # ears_active: Mapped[str]
     genres: Mapped[List['Genre']] = relationship(
-        secondary='association_table_band_genres', back_populates='bands', 
+        secondary='association_table_band_genres', back_populates='bands', lazy="selectin"
     )
     # genre_associations: Mapped[List['AssociationBandGenres']] = relationship(back_populates='band')
-    discography: Mapped[List['Album']] = relationship('Album', back_populates='band', cascade='delete, all')
+    discography: Mapped[List['Album']] = relationship(
+        'Album', back_populates='band', cascade='delete, all'
+    )
     themes: Mapped[str] = mapped_column(String(100), nullable=True)
     pictures: Mapped[List['BandPicture']] = relationship(
-        secondary='association_band_pictures', back_populates='bands'
+        secondary='association_band_pictures', back_populates='bands', lazy="selectin"
     )
     # picture_associations: Mapped[List['AssociationBandPicture']] = relationship(back_populates='band')
     commentary: Mapped[str] = mapped_column(String(300), nullable=True)
 
     @property
     def genres_str(self):
-        string = ''
-        for genre in self.genres:
-            string+= genre.genre
-        print(string)
-        return string
+        url_list = []
+        [url_list.append(genre.genre) for genre in self.genres]
+        return url_list
+    
+    @property
+    def pictures_url(self):
+        url_list = []
+        [url_list.append(picture.path) for picture in self.pictures]
+        return url_list  
+            
 class Album(Base):
     __tablename__ = 'albums'
 
@@ -97,12 +104,13 @@ class Album(Base):
     limitation: Mapped[int] = mapped_column(Integer)
     band_id: Mapped[str] = mapped_column(ForeignKey('bands.id'), nullable=False)
     band: Mapped['Band'] = relationship('Band', back_populates='discography')
-    songs: Mapped[List['Track']] = relationship('Track', back_populates='album', cascade='delete, all')
+    songs: Mapped[List['Track']] = relationship(
+        'Track', back_populates='album', cascade='delete, all', lazy='selectin')
     pictures: Mapped[List['AlbumPicture']] = relationship(
         secondary='associations_album_picture', back_populates='album'
     )
     # picture_associations: Mapped[List['AssociationsAlbumPicture']] = relationship(back_populates='album')
-    commentary: Mapped[str] = mapped_column(String(300))
+    commentary: Mapped[str] = mapped_column(String(300), nullable=True)
 
 
 class Track(Base):
@@ -137,7 +145,7 @@ class BandPicture(Base):
     id: Mapped[str] = mapped_column(
         UUID(as_uuid=False), primary_key=True, default=lambda _: str(uuid.uuid4())
     )
-    path: Mapped[str] = mapped_column(String(60), nullable=True)
+    path: Mapped[str] = mapped_column(String(300), nullable=True)
     bands: Mapped[List['Band']] = relationship(
         secondary='association_band_pictures', back_populates='pictures'
     )
