@@ -36,7 +36,7 @@ async def get_by_id(
         session: AsyncSession,
         band_id: str, 
 ) -> Band:
-    to_db = select(Band).options(selectinload(Band.genres)).where(Band.id == band_id)
+    to_db = select(Band).where(Band.id == band_id)
     band = await session.scalar(to_db)
     return band
 

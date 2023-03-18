@@ -16,7 +16,7 @@ alembic upgrade head
 import uuid
 from typing import List
 import datetime
-from sqlalchemy import String, Integer, ForeignKey, Table, Column, Float
+from sqlalchemy import String, Integer, ForeignKey, Table, Column, Float, DateTime
 from sqlalchemy.dialects.postgresql import UUID
 from sqlalchemy.orm import DeclarativeBase, Mapped, mapped_column, relationship
 from sqlalchemy_utils import ChoiceType
@@ -53,15 +53,15 @@ class Band(Base):
     contry_of_origin: Mapped[str] = mapped_column(String(30), nullable=False)
     location: Mapped[str] = mapped_column(String(30), nullable=False)
     status: Mapped[ChoiceType] = mapped_column(ChoiceType(STATUS))
-    formed_in: Mapped[datetime.datetime]
+    formed_in: Mapped[datetime.date]
     description: Mapped[str] = mapped_column(String(800), nullable=True)
     # # ears_active: Mapped[str]
     genres: Mapped[List['Genre']] = relationship(
-        secondary='association_table_band_genres', back_populates='bands', lazy="selectin"
+        secondary='association_table_band_genres', back_populates='bands', lazy="selectin",
     )
     # genre_associations: Mapped[List['AssociationBandGenres']] = relationship(back_populates='band')
     discography: Mapped[List['Album']] = relationship(
-        'Album', back_populates='band', cascade='delete, all'
+        'Album', back_populates='band', cascade='delete, all', lazy='selectin',
     )
     themes: Mapped[str] = mapped_column(String(100), nullable=True)
     pictures: Mapped[List['BandPicture']] = relationship(
@@ -96,9 +96,9 @@ class Album(Base):
     )
     name: Mapped[str] = mapped_column(String(100), nullable=False)
     type_: Mapped[str] = mapped_column(String(10), nullable=False)
-    release_date = Mapped[datetime.datetime]
+    release_date: Mapped[datetime.date]
     catalog_id: Mapped[str] = mapped_column(String(30))
-    version_desc = Mapped[str]
+    version_desc: Mapped[str]
     label: Mapped[str] = mapped_column(String(30))
     format: Mapped[ChoiceType] = mapped_column(ChoiceType(FORMAT))
     limitation: Mapped[int] = mapped_column(Integer)
@@ -158,7 +158,7 @@ class AlbumPicture(Base):
     id: Mapped[str] = mapped_column(
         UUID(as_uuid=False), primary_key=True, default=lambda _: str(uuid.uuid4())
     )
-    path: Mapped[str] = mapped_column(String(60), nullable=True)
+    path: Mapped[str] = mapped_column(String(100), nullable=True)
     album: Mapped[List['Album']] = relationship(
         secondary='associations_album_picture', back_populates='pictures'
     )
