@@ -41,6 +41,7 @@ class AlbumCreateSchema(BaseAlbum):
 
 
 class AlbumListSchema(BaseAlbum):
+    id: str
     name: str
     type_: str
     limitation: str

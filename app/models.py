@@ -107,7 +107,7 @@ class Album(Base):
     songs: Mapped[List['Track']] = relationship(
         'Track', back_populates='album', cascade='delete, all', lazy='selectin')
     pictures: Mapped[List['AlbumPicture']] = relationship(
-        secondary='associations_album_picture', back_populates='album'
+        'AlbumPicture', back_populates='album'
     )
     # picture_associations: Mapped[List['AssociationsAlbumPicture']] = relationship(back_populates='album')
     commentary: Mapped[str] = mapped_column(String(300), nullable=True)
@@ -159,9 +159,11 @@ class AlbumPicture(Base):
         UUID(as_uuid=False), primary_key=True, default=lambda _: str(uuid.uuid4())
     )
     path: Mapped[str] = mapped_column(String(100), nullable=True)
-    album: Mapped[List['Album']] = relationship(
-        secondary='associations_album_picture', back_populates='pictures'
-    )
+    # album: Mapped[List['Album']] = relationship(
+    #     secondary='associations_album_picture', back_populates='pictures'
+    # )
+    album_id: Mapped['Album'] = mapped_column(ForeignKey('albums.id'), nullable=False)
+    album: Mapped[str] = relationship('Album', back_populates='pictures')
     # album_assotiations: Mapped[List['AssociationsAlbumPicture']] = relationship(back_populates='picture')
 
 

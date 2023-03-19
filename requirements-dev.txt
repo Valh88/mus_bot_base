@@ -62,3 +62,4 @@ virtualenv==20.17.1 ; python_version >= "3.11" and python_version < "4.0"
 watchfiles==0.18.1 ; python_version >= "3.11" and python_version < "4.0"
 websockets==10.4 ; python_version >= "3.11" and python_version < "4.0"
 sqlalchemy-utils==0.40.0
+aiofiles==23.1.0

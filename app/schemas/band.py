@@ -46,7 +46,7 @@ class BandFullSchema(BaseBand):
     contry_of_origin: str 
     location: str
     # status: str
-    # discography: List[AlbumListSchema]
+    discography: List[AlbumListSchema] = []
     pictures_url: List[str]
     formed_in: datetime.date
     description: str

@@ -48,5 +48,4 @@ async def get_by_id(
 )-> Album:
     to_db = select(Album).where(Album.id == album_id)
     album = await session.scalar(to_db)
-    print(album)
     return album

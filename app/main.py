@@ -34,7 +34,10 @@ if config.settings.ENVIRONMENT == 'PYTEST':
     from fastapi.staticfiles import StaticFiles
     # print(str(Path(__file__).parents[1]) + "/media")
     app.mount(
-        '/media/band/', StaticFiles(directory="media/band"), name='band'
+        '/media/band/', StaticFiles(directory="media/band"), name='band',
+    ),
+    app.mount(
+        '/media/album/id/', StaticFiles(directory="media/album",), name='album'
     )
 
     
