@@ -19,3 +19,12 @@ async def get(
 ) -> List[Genre]:  
     genress_list = await session.execute(select(Genre))
     return genress_list.scalars().all()
+
+
+async def get_by_id(
+        session: AsyncSession,
+        genre_id: str
+) -> Genre:
+    to_db = select(Genre).where(Genre.id == genre_id)
+    genre = await session.scalar(to_db)
+    return genre

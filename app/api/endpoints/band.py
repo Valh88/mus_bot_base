@@ -26,6 +26,7 @@ async def get_all_bands(
     bands_list = await bands.get_all_bands(session=session)
     return bands_list
 
+
 @router.post('/band')
 async def create_band(
     band: schema.BandSchema,

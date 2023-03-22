@@ -4,6 +4,7 @@ from sqlalchemy import select
 from sqlalchemy.orm import selectinload
 from app.models import Band, AssociationBandGenres, Genre
 from app.schemas import band as schema
+from app.crud import  genres
 import datetime
 
 
@@ -11,7 +12,7 @@ async def create(
         session: AsyncSession,
         band: schema.BandSchema
 ) -> Band:
-    genres = band.genres
+    band_genres = band.genres
     band = Band(
         name=band.name,
         contry_of_origin=band.contry_of_origin,
@@ -23,12 +24,13 @@ async def create(
         # commentary='3123123',
     )
     session.add(band), await session.commit()
-    if len(genres) > 0:
+    if len(band_genres) > 0:
         asociation_obj_list = [
-            AssociationBandGenres(band_id=band.id, genre_id=genres_id) for genres_id in genres
+            AssociationBandGenres(band_id=band.id, genre_id=genres_id) for genres_id in band_genres
+            if genres.get_by_id(session=session, genre_id=genres_id)
         ]
         [session.add(obj) for obj in asociation_obj_list]
-        await session.commit()            
+        await session.commit()
     return band
 
 
