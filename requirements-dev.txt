@@ -63,3 +63,5 @@ watchfiles==0.18.1
 websockets==10.4
 sqlalchemy-utils==0.40.0
 aiofiles==23.1.0
+toml==0.10.2
+sqlalchemy_utils==0.40.0

@@ -81,7 +81,8 @@ class Band(Base):
         url_list = []
         [url_list.append(picture.path) for picture in self.pictures]
         return url_list  
-            
+
+
 class Album(Base):
     __tablename__ = 'albums'
 

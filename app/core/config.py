@@ -38,7 +38,7 @@ PYPROJECT_CONTENT = toml.load(f"{PROJECT_DIR}/pyproject.toml")["tool"]["poetry"]
 class Settings(BaseSettings):
     # CORE SETTINGS
     SECRET_KEY: str
-    ENVIRONMENT: Literal["DEV", "PYTEST", "STG", "PRD"] = "PYTEST"
+    ENVIRONMENT: Literal["DEV", "PYTEST", "STG", "PRD"]
     SECURITY_BCRYPT_ROUNDS: int = 12
     ACCESS_TOKEN_EXPIRE_MINUTES: int = 11520  # 8 days
     REFRESH_TOKEN_EXPIRE_MINUTES: int = 40320  # 28 days

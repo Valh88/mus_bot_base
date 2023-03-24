@@ -24,23 +24,35 @@ services:
     build:
       context: ./
       dockerfile: Dockerfile
+    volumes:
+      - ./media/band:/build/media/band
     env_file:
       - .env
     environment:
       - DEFAULT_DATABASE_HOSTNAME=postgres
       - DEFAULT_DATABASE_PORT=5432
     ports:
-      - 80:8000
-  # nginx:
-  #   build: ./nginx
-  #   volumes:
-  #     - ./media:/www/data/images
-  #   ports:
-  #     - "8080:80"
-  #   depends_on:
-  #     - app
-  #   networks:
-  #     - network
+      - 8000:8000
+  pgadmin:
+    image: dpage/pgadmin4
+    environment:
+      - PGADMIN_LISTEN_ADDRESS=0.0.0.0
+      - PGADMIN_LISTEN_PORT=5050
+      - PGADMIN_DEFAULT_EMAIL=test@example.com
+      - PGADMIN_DEFAULT_PASSWORD=1
+    ports:
+      - 5050:5050
+    # volumes:
+    #   - "./pgadmin:/var/lib/pgadmin"
+  nginx:
+    build: ./nginx
+    volumes:
+      - ./media:/www/data/media
+    ports:
+      - "8080:80"
+    depends_on:
+      - web
 
 volumes:
   postgres_data:
+  media:
